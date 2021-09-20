@@ -76,6 +76,7 @@ class Cassini {
     void type_shape();
     void T_print_R();
     void T_inflect_point();
+    void func_change_point_offer();
 
 };
 

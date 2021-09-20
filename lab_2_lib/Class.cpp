@@ -1,6 +1,6 @@
 #include "Class.h"
 #include <iostream>
-#include <string.h>
+#include <cstring>
 #include <cmath>
 
 #define pi 3.141592653
@@ -259,6 +259,20 @@ double inflect_point(Cassini &line) {
 
 void Cassini::T_inflect_point(){ //поиск точек перегиба кривой
     inflect_point(*this);
+}
+
+void Cassini::func_change_point_offer(){
+    cout<<"введите смещение по х\n";
+
+    double x;
+    cin>>x;
+    cout<<"введите смещение по y\n";
+    double y;
+    cin>>y;
+
+    this->offset_x = x;
+    this->offset_y = y;
+
 }
 
 
