@@ -21,30 +21,30 @@ int main() {
         choice = get_int();
         switch (choice) {
             case 1:
-                func_field_fill(*line);
+                line->func_field_fill();
                 break;
 
             case 2:
-                T_find_dist(*line);
+                line->T_find_dist();
                 break;
 
             case 3:
-                type_shape(*line);
+                line->type_shape();
                 break;
 
 
             case 4:
-                T_print_R(*line);
+                line->T_print_R();
                 break;
 
 
             case 5:
-                T_inflect_point(*line);
+                line->T_inflect_point();
                 break;
 
 
             case 6:
-                T_func_output(*line);
+                line->T_func_output();
                 break;
 
 

@@ -29,15 +29,47 @@ int get_int() {
     return num;
 }
 
-void func_field_fill(Cassini &line) {
-    double half_dist;
-    double square_root;
-    cout << "Введите значения для параметра квадратного кореня из произведения расстояний, "
-            "от фокусов до любой точки(a)\n";
-    cin >> square_root;
-    cout << "Введите значения для параметра расстояния между фокусом и центром(c)\n";
-    cin >> half_dist;
-    line.set_parameters(square_root, half_dist);
+void Cassini::func_field_fill() {
+    cout<<"1.Установить оба параметра\n";
+    cout<<"2.Изменение значения для параметра квадратного кореня из произведения расстояний, "
+          "от фокусов до любой точки(a)\n";
+    cout<<"3.Изменение значения для параметра расстояния между фокусом и центром(c)\n";
+    int choice;
+
+    cin>>choice;
+    if(choice != 1 and choice!= 2 and choice != 3){
+        cout<<"Введено неверное значение\n";
+    }
+
+    if(choice == 1) {
+        double half_dist;
+        double square_root;
+        cout << "Введите значения для параметра квадратного кореня из произведения расстояний, "
+                "от фокусов до любой точки(a)\n";
+        cin >> square_root;
+        cout << "Введите значения для параметра расстояния между фокусом и центром(c)\n";
+        cin >> half_dist;
+        set_both_parameters(square_root, half_dist);
+
+    }
+
+    if(choice == 2){
+        double square_root;
+        cout << "Введите значения для параметра квадратного кореня из произведения расстояний, "
+                "от фокусов до любой точки(a)\n";
+        cin >> square_root;
+
+        set_square_root(square_root);
+    }
+
+    if(choice == 3){
+        double half_dist;
+        cout << "Введите значения для параметра расстояния между фокусом и центром(c)\n";
+        cin >> half_dist;
+
+        set_half_dist(half_dist);
+    }
+
 }
 
 char *func_output(Cassini &line) {
@@ -53,16 +85,16 @@ char *func_output(Cassini &line) {
 
 }
 
-void T_func_output(Cassini &line) {
+void Cassini::T_func_output() {
 
-    char *final = func_output(line);
+    char *final = func_output(*this);
     cout << final << endl;
 }
 
 
-void type_shape(Cassini &line) { //Определение типа кривой
-    double c = line.get_half_dist();
-    double a = line.get_square_root();
+void Cassini::type_shape() { //Определение типа кривой
+    double c = get_half_dist();
+    double a = get_square_root();
 
     double s = c/a;
 
@@ -101,6 +133,18 @@ void type_shape(Cassini &line) { //Определение типа кривой
     cout << "Вырожденная кривая\n";
 
 }
+
+double new_r(int w, double r, Cassini &line){//функиця фозвращающая новое значение радиуса при смещении центра фигуры
+    double cos_r = r * cos(w * (pi / 180));
+    double sin_r = r * sin(w* (pi / 180));
+
+    double X = cos_r + line.get_offset_x();
+    double Y = sin_r + line.get_offset_y();
+
+    return sqrt(X*X + Y*Y); //новый радиус
+}
+
+
 double find_dist(int w, Cassini &line){
     double c = line.get_half_dist();
     double a = line.get_square_root();
@@ -112,30 +156,33 @@ double find_dist(int w, Cassini &line){
     r_long = sqrt(c * c * cos(2 * w* (pi / 180) ) -
                   sqrt  ( pow(c, 4) * pow(cos(2 * w* (pi / 180) ), 2) + pow(a, 4) - pow(c, 4)  )   );
 
+    r = new_r(w,r, line);
+    r_long = new_r(w,r_long,line);
+
     cout<<"Расстояние до начала координат в полярных координатах = "<<r<<" "<<r_long<<endl;
 
     return r;
 }
 
-void T_find_dist(Cassini &line){ //поиск расстояния от центра фигуры, до точки кривой, обозначенной углом
+void Cassini::T_find_dist(){ //поиск расстояния от центра фигуры, до точки кривой, обозначенной углом
     int w;
     cout<<"Введите угол в градусах\n";
     cin>>w;
 
-    if(w >= 90 and w < 180){
-        w = 180 - w;
-    }
-    if(w >= 180 and w< 270){
-        w = 270 - w;
-    }
-    if(w >= 270 and w <= 360){
-        w = 360 - w;
-    }
+//    if(w >= 90 and w < 180){
+//        w = w - 90;
+//    }else
+//        if(w >= 180 and w< 270){
+//        w = w - 180;
+//    }else
+//    if(w >= 270 and w <= 360){
+//        w = w - 270;
+//    }else
     if(w > 360 or w < 0){
         cout<<"Неверный угол";
         return;
     }
-    find_dist(w,line);
+    find_dist(w,*this);
 
 }
 
@@ -151,6 +198,9 @@ double print_R(int w, Cassini &line){
     r_long = sqrt(c * c * cos(2 * w* (pi / 180) ) -
                   sqrt  ( pow(c, 4) * pow(cos(2 * w* (pi / 180) ), 2) + pow(a, 4) - pow(c, 4)  )   );
 
+    r = new_r(w,r, line);
+    r_long = new_r(w,r_long,line);
+
     cout<<"У данной кривой радиус кривизны = ";
 
     double R =  2*a*a*r*r*r/(pow(c,4)-pow(a,4)+3*pow(r,4));
@@ -160,22 +210,26 @@ double print_R(int w, Cassini &line){
     return R;
 }
 
-void T_print_R(Cassini &line){   //поиск радиуса кривизны точки кривой, обозначенной углом
+void Cassini::T_print_R(){   //поиск радиуса кривизны точки кривой, обозначенной углом
     int w;
     cout<<"Введите угол в градусах [0;360]\n";
     cin>>w;
 
-    if(w >= 90 and w < 180){
-        w = 180 -w;
-    }
-    if(w >= 180 and w< 270){
-        w = 270 - w;
-    }
-    if(w >= 270 and w <= 360){
-        w = 360 - w;
+//    if(w >= 90 and w < 180){
+//        w = 180 -w;
+//    }
+//    if(w >= 180 and w< 270){
+//        w = 270 - w;
+//    }
+//    if(w >= 270 and w <= 360){
+//        w = 360 - w;
+//    }
+    if(w > 360 or w < 0){
+        cout<<"Неверный угол";
+        return;
     }
 
-    print_R(w,line);
+    print_R(w, *this);
 }
 
 
@@ -191,10 +245,10 @@ double inflect_point(Cassini &line) {
         double x = r * sqrt((1 - sqrt(1 / 3 * (pow(a, 4) / pow(c, 4)))) / 2);
         double y = r * sqrt(1 - (1 - sqrt(1 / 3 * (pow(a, 4) / pow(c, 4)))) / 2);
 
-        cout<<"x1 ="<<x<<"  y1 = "<<y<<endl;
-        cout<<"x2 ="<<-x<<"  y2 = "<<y<<endl;
-        cout<<"x3 ="<<x<<"  y3 = "<<-y<<endl;
-        cout<<"x4 ="<<-x<<"  y4 = "<<-y<<endl;
+        cout<<"x1 ="<<x + line.get_offset_x()<<"  y1 = "<<y + line.get_offset_y()<<endl;
+        cout<<"x2 ="<<-x + line.get_offset_x()<<"  y2 = "<<y + line.get_offset_y()<<endl;
+        cout<<"x3 ="<<x + line.get_offset_x()<<"  y3 = "<<-y + line.get_offset_y()<<endl;
+        cout<<"x4 ="<<-x + line.get_offset_x()<<"  y4 = "<<-y + line.get_offset_y()<<endl;
         return x;
     }else{
         cout<<"У данной кривой не существует точек перегиба\n";
@@ -203,8 +257,8 @@ double inflect_point(Cassini &line) {
 
 }
 
-void T_inflect_point(Cassini &line){ //поиск точек перегиба кривой
-    inflect_point(line);
+void Cassini::T_inflect_point(){ //поиск точек перегиба кривой
+    inflect_point(*this);
 }
 
 
